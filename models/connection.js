@@ -6,10 +6,15 @@ var options = {
     useNewUrlParser: true
 }
 
-mongoose.connect('mongodb+srv://admin:admin@cluster0.ycj2n.mongodb.net/weatherapp?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://admin:admin@cluster0.ycj2n.mongodb.net/sportbuddy?retryWrites=true&w=majority',
     options,
     function(err){
-        console.log(err)
+        if (err){
+            console.log("ERREUR DE CONNECTION",err)
+            return;
+        }
+        console.log("BD CONNECTION REUSSIE")
+        
     }
 )
 
