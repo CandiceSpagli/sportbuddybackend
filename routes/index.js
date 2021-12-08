@@ -80,20 +80,68 @@ router.post("/sign-up", async function (req, res, next) {
 /* POST SIGN IN*/
 router.post("/sign-in", async function (req, res, next) {
   console.log("req.body-sign-in", req.body);
-  var searchUser = await UserModel.findOne({
-    email: req.body.email,
-    password: req.body.password,
-  });
-  console.log("---------searchUser", searchUser);
-  if (searchUser === null) {
-    res.json({ result: false });
-  } else {
-    res.json({ result: true });
+  // var searchUser = await UserModel.findOne({
+  //   email: req.body.email,
+  //   password: req.body.password,
+  // });
+  // console.log("---------searchUser", searchUser);
+  // if (searchUser === null) {
+  //   res.json({ result: false });
+  // } else {
+  //   res.json({ result: true });
+  // }
+
+  var result = false;
+  var user = null;
+  var error = [];
+  var token = null;
+
+  if (req.body.email == "" || req.body.password == "") {
+    error.push("champs vides");
   }
+
+  if (error.length === 0) {
+    user = await UserModel.findOne({
+      email: req.body.email,
+    });
+
+    if (user) {
+      if (bcrypt.compareSync(req.body.password, user.password)) {
+        result = true;
+        token = user.token;
+      } else {
+        result = false;
+        error.push("mot de passe incorrect");
+      }
+    } else {
+      error.push("email incorrect");
+    }
+  }
+
+  res.json({ result, user, error, token });
 });
 
+<<<<<<< HEAD
 router.post("/settings", async function (req, res, next) {
   console.log("req.body.");
 });
+=======
+//SETTINGS
+
+// router.post("/settings", async function (req, res, next) {
+//   var searchUser = new UserModel({
+//     //     username: req.body.username,
+//     //     email: req.body.email,
+//     //     password: req.body.password,
+//     //     token: "azert",
+//     //   });
+
+//     //   var userSaved = await newUser.save();
+//       // var searchUser = await UserModel.findOne({
+//   //   email: req.body.email,
+//   //   password: req.body.password,
+//   // });
+// });
+>>>>>>> fd8fca1fba3be3b9fcbc6de170c74ef8da134726
 
 module.exports = router;
