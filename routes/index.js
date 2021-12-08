@@ -92,4 +92,8 @@ router.post("/sign-in", async function (req, res, next) {
   }
 });
 
+router.post("/settings", async function (req, res, next) {
+  console.log("req.body.");
+});
+
 module.exports = router;
