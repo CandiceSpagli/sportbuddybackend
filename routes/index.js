@@ -160,5 +160,4 @@ router.post("/settings", async function (req, res, next) {
 //   //   password: req.body.password,
 //   // });
 // });
-
 module.exports = router;
