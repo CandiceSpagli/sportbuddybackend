@@ -5,6 +5,7 @@ var uid2 = require("uid2");
 var bcrypt = require("bcrypt");
 
 var UserModel = require("../models/users");
+const { token } = require("morgan");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -121,11 +122,28 @@ router.post("/sign-in", async function (req, res, next) {
   res.json({ result, user, error, token });
 });
 
-<<<<<<< HEAD
 router.post("/settings", async function (req, res, next) {
-  console.log("req.body.");
+  console.log("BODY FROM SETTINGS", req.body.token);
+  const data = await UserModel.findOne({
+    token: "E28ei66sFtGjm4aGOHW8CQ2dxX6CzuEs",
+  });
+
+  const updateUser = await UserModel.updateOne({
+    token: req.body.token,
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+  });
+
+  // var settingsUser = new UserModel({
+  //   lastname: req.body.lastName,
+  //   firstname: req.body.firstName,
+  // });
+  // console.log("SETTING USER", settingsUser);
+  var userUpdate = await settingsUser.save();
+
+  res.json({ updateUser, userUpdate });
 });
-=======
+
 //SETTINGS
 
 // router.post("/settings", async function (req, res, next) {
@@ -142,6 +160,5 @@ router.post("/settings", async function (req, res, next) {
 //   //   password: req.body.password,
 //   // });
 // });
->>>>>>> fd8fca1fba3be3b9fcbc6de170c74ef8da134726
 
 module.exports = router;
