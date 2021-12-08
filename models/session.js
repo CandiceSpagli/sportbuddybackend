@@ -9,6 +9,6 @@ var sessionSchema = mongoose.Schema({
 });
 
 var SessionModel = mongoose.model("session", sessionSchema);
-console.log("Sessionmodel from models", SessionModel);
+console.log("SessionModel from models", SessionModel);
 
 module.exports = SessionModel;
