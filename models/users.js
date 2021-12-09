@@ -10,6 +10,7 @@ var userSchema = mongoose.Schema({
   age: Number,
   picture: String,
   desc: String,
+  dateOfBirth: Date,
   location: {
     long: Number,
     lat: Number,
