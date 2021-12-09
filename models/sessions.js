@@ -1,7 +1,11 @@
 var mongoose = require("mongoose");
 
 var sessionSchema = mongoose.Schema({
+  creatorId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+  buddyId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
   date: Date,
+  level: Number,
+  sport: String,
   location: {
     long: Number,
     lat: Number,
