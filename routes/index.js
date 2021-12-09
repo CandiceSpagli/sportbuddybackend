@@ -4,6 +4,7 @@ var router = express.Router();
 var uid2 = require("uid2");
 var bcrypt = require("bcrypt");
 
+var SessionModel = require("../models/sessions");
 var UserModel = require("../models/users");
 const { token } = require("morgan");
 
@@ -122,6 +123,7 @@ router.post("/sign-in", async function (req, res, next) {
   res.json({ result, user, error, token });
 });
 
+/* POST SETTINGS*/
 router.post("/settings", async function (req, res, next) {
   console.log("BODY FROM SETTINGS", req.body);
   const data = await UserModel.findOne({
@@ -145,6 +147,35 @@ router.post("/settings", async function (req, res, next) {
   var userUpdate = await updateUser.save();
 
   res.json({ updateUser, userUpdate });
+});
+
+/* POST PROFIL page. */
+router.post("/profil", async function (req, res, next) {
+  res.render("index", { title: "Express" });
+});
+
+/* POST SESSION page. */
+router.post("/sessions", async function (req, res, next) {
+  console.log("BODY FROM SESSION", req.body);
+  const data = await UserModel.findOne({
+    token: req.body.token,
+  });
+  console.log("DATA token FROM SESSIONS", data);
+
+  const newSession = new SessionModel({
+    creatorId: data._id,
+    date: req.body.date,
+    level: req.body.level,
+    sport: req.body.sport,
+    location: {
+      long: req.body.long,
+      lat: req.body.lat,
+    },
+  });
+
+  var sessionSaved = await newSession.save();
+
+  res.json({ sessionSaved });
 });
 
 //SETTINGS

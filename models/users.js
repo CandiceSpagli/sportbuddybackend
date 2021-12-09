@@ -1,5 +1,10 @@
 var mongoose = require("mongoose");
 
+var sportSchema = mongoose.Schema({
+  type: String,
+  level: Number,
+});
+
 var userSchema = mongoose.Schema({
   lastname: String,
   firstname: String,
@@ -16,6 +21,7 @@ var userSchema = mongoose.Schema({
     lat: Number,
   },
   token: String,
+  sports: [sportSchema],
 });
 
 var UserModel = mongoose.model("users", userSchema);
