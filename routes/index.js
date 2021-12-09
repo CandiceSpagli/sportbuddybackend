@@ -123,7 +123,7 @@ router.post("/sign-in", async function (req, res, next) {
 });
 
 router.post("/settings", async function (req, res, next) {
-  console.log("BODY FROM SETTINGS", req.body.token);
+  console.log("BODY FROM SETTINGS", req.body);
   const data = await UserModel.findOne({
     token: "E28ei66sFtGjm4aGOHW8CQ2dxX6CzuEs",
   });
@@ -132,6 +132,8 @@ router.post("/settings", async function (req, res, next) {
     token: req.body.token,
     firstname: req.body.firstname,
     lastname: req.body.lastname,
+    dateOfBirth: req.body.dateOfBirth,
+    gender: req.body.gender,
   });
 
   // var settingsUser = new UserModel({
@@ -139,7 +141,8 @@ router.post("/settings", async function (req, res, next) {
   //   firstname: req.body.firstName,
   // });
   // console.log("SETTING USER", settingsUser);
-  var userUpdate = await settingsUser.save();
+  console.log("dateOfBirth", dateOfBirth);
+  var userUpdate = await updateUser.save();
 
   res.json({ updateUser, userUpdate });
 });
