@@ -160,4 +160,14 @@ router.post("/settings", async function (req, res, next) {
 //   //   password: req.body.password,
 //   // });
 // });
+
+router.get('/buddiesScreen', async function(req, res, next) {
+  console.log('<<<back /buddiesScreen');
+  var users = await UserModel.find()
+  res.json({
+    result: true,
+    users
+  })
+})
+
 module.exports = router;
