@@ -1,8 +1,17 @@
 var express = require("express");
 var router = express.Router();
+var fs = require('fs');
+var uniqid = require('uniqid');
 
 var uid2 = require("uid2");
 var bcrypt = require("bcrypt");
+
+var cloudinary = require('cloudinary').v2
+cloudinary.config({
+  cloud_name: 'de1o88p9o',
+  api_key: '172944832267927',
+  api_secret: 'pms6k9XCrnas-dVekWDf8pj-Kmw'
+})
 
 var SessionModel = require("../models/sessions");
 var UserModel = require("../models/users");
@@ -136,6 +145,7 @@ router.post("/settings", async function (req, res, next) {
     lastname: req.body.lastname,
     dateOfBirth: req.body.dateOfBirth,
     gender: req.body.gender,
+    picture: resultCloudinary.secure_url
   });
 
   // var settingsUser = new UserModel({
@@ -195,12 +205,32 @@ router.post("/sessions", async function (req, res, next) {
 //   // });
 // });
 
+
+router.post('/picupload', async function(req, res, next) {
+  
+  var pictureName = './tmp/'+uniqid()+'.jpg';
+  var resultCopy = await req.files.avatar.mv(pictureName);
+  if(!resultCopy) {
+    var resultCloudinary = await cloudinary.uploader.upload(pictureName);
+    res.json({
+      resultCloudinary,
+    });
+    console.log('resultCloudinary' , resultCloudinary);
+  } else {
+    res.json({error: resultCopy});
+  }
+  fs.unlinkSync(pictureName);
+});
+
 router.get('/buddiesScreen', async function(req, res, next) {
   console.log('<<<back /buddiesScreen');
-  var users = await UserModel.find()
+  var sessions = await SessionModel.find()
+    .populate('creatorId')
+    .exec()
+  console.log('sessions.creatorId',sessions);
   res.json({
     result: true,
-    users
+    sessions
   })
 })
 
