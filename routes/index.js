@@ -240,4 +240,15 @@ router.get('/buddiesScreen', async function(req, res, next) {
   })
 })
 
+router.get('/searchScreen', async function(req, res, next) {
+  console.log('<<<back /searchScreen');
+  var users = await UserModel.find()
+  // console.log('users search',users);
+  res.json({
+    result: true,
+    users
+  })
+})
+
+
 module.exports = router;
