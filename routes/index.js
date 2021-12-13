@@ -235,15 +235,21 @@ router.post("/picupload", async function (req, res, next) {
   fs.unlinkSync(pictureName);
 });
 
-router.get("/buddiesScreen", async function (req, res, next) {
-  console.log("<<<back /buddiesScreen");
-  var sessions = await SessionModel.find().populate("creatorId").exec();
-  console.log("sessions.creatorId", sessions);
+router.get('/buddiesScreen', async function(req, res, next) {
+  console.log('<<<back /buddiesScreen');
+  var sessions = await SessionModel.find()
+    .populate('creatorId')
+    .exec()
+  // console.log('sessions.creatorId',sessions);
+  
+  var filteredBySportSessions = await SessionModel.find({sport : 'yoga'})
+  console.log('filteredBySportSessions', filteredBySportSessions);
+
   res.json({
     result: true,
     sessions,
-  });
-});
+  })
+})
 
 router.get("/searchScreen", async function (req, res, next) {
   console.log("<<<back /searchScreen");
