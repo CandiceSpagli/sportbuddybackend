@@ -1,17 +1,17 @@
 var express = require("express");
 var router = express.Router();
-var fs = require('fs');
-var uniqid = require('uniqid');
+var fs = require("fs");
+var uniqid = require("uniqid");
 
 var uid2 = require("uid2");
 var bcrypt = require("bcrypt");
 
-var cloudinary = require('cloudinary').v2
+var cloudinary = require("cloudinary").v2;
 cloudinary.config({
-  cloud_name: 'de1o88p9o',
-  api_key: '172944832267927',
-  api_secret: 'pms6k9XCrnas-dVekWDf8pj-Kmw'
-})
+  cloud_name: "de1o88p9o",
+  api_key: "172944832267927",
+  api_secret: "pms6k9XCrnas-dVekWDf8pj-Kmw",
+});
 
 var SessionModel = require("../models/sessions");
 var UserModel = require("../models/users");
@@ -136,28 +136,37 @@ router.post("/sign-in", async function (req, res, next) {
 /* POST SETTINGS*/
 router.post("/settings", async function (req, res, next) {
   console.log("BODY FROM SETTINGS", req.body);
-  const data = await UserModel.findOne({
-    token: "E28ei66sFtGjm4aGOHW8CQ2dxX6CzuEs",
-  });
+  // const data = await UserModel.findOne({
+  //   token: req.body.token,
+  // });
+  // console.log("SETTINGS TOKEN", data);
 
-  const updateUser = await UserModel.updateOne({
-    token: req.body.token,
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-    dateOfBirth: req.body.dateOfBirth,
-    gender: req.body.gender,
-    picture: resultCloudinary.secure_url
-  });
+  const updateUser = await UserModel.updateOne(
+    { token: req.body.token },
+    {
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      // dateOfBirth: req.body.dateOfBirth,
+      gender: req.body.gender,
+      // picture: resultCloudinary.secure_url,
+      sports: [
+        {
+          sportNameOne: req.body.sportNameOne,
+          sportLevelOne: req.body.sportLevelOne,
+        },
+      ],
+    }
+  );
+  console.log("UPDATE USER", updateUser);
 
   // var settingsUser = new UserModel({
   //   lastname: req.body.lastName,
   //   firstname: req.body.firstName,
   // });
   // console.log("SETTING USER", settingsUser);
-  console.log("dateOfBirth", dateOfBirth);
-  var userUpdate = await updateUser.save();
+  // console.log("dateOfBirth", dateOfBirth);
 
-  res.json({ updateUser, userUpdate });
+  res.json({ updateUser });
 });
 
 /* POST PROFIL page. */
@@ -211,44 +220,39 @@ router.post("/sessions", async function (req, res, next) {
 //   // });
 // });
 
-
-router.post('/picupload', async function(req, res, next) {
-  
-  var pictureName = './tmp/'+uniqid()+'.jpg';
+router.post("/picupload", async function (req, res, next) {
+  var pictureName = "./tmp/" + uniqid() + ".jpg";
   var resultCopy = await req.files.avatar.mv(pictureName);
-  if(!resultCopy) {
+  if (!resultCopy) {
     var resultCloudinary = await cloudinary.uploader.upload(pictureName);
     res.json({
       resultCloudinary,
     });
-    console.log('resultCloudinary' , resultCloudinary);
+    console.log("resultCloudinary", resultCloudinary);
   } else {
-    res.json({error: resultCopy});
+    res.json({ error: resultCopy });
   }
   fs.unlinkSync(pictureName);
 });
 
-router.get('/buddiesScreen', async function(req, res, next) {
-  console.log('<<<back /buddiesScreen');
-  var sessions = await SessionModel.find()
-    .populate('creatorId')
-    .exec()
-  console.log('sessions.creatorId',sessions);
+router.get("/buddiesScreen", async function (req, res, next) {
+  console.log("<<<back /buddiesScreen");
+  var sessions = await SessionModel.find().populate("creatorId").exec();
+  console.log("sessions.creatorId", sessions);
   res.json({
     result: true,
-    sessions
-  })
-})
+    sessions,
+  });
+});
 
-router.get('/searchScreen', async function(req, res, next) {
-  console.log('<<<back /searchScreen');
-  var users = await UserModel.find()
+router.get("/searchScreen", async function (req, res, next) {
+  console.log("<<<back /searchScreen");
+  var users = await UserModel.find();
   // console.log('users search',users);
   res.json({
     result: true,
-    users
-  })
-})
-
+    users,
+  });
+});
 
 module.exports = router;
