@@ -233,10 +233,14 @@ router.get('/buddiesScreen', async function(req, res, next) {
   var sessions = await SessionModel.find()
     .populate('creatorId')
     .exec()
-  console.log('sessions.creatorId',sessions);
+  // console.log('sessions.creatorId',sessions);
+  
+  var filteredBySportSessions = await SessionModel.find({sport : 'yoga'})
+  console.log('filteredBySportSessions', filteredBySportSessions);
+
   res.json({
     result: true,
-    sessions
+    sessions,
   })
 })
 
