@@ -52,7 +52,8 @@ router.post("/sign-up", async function (req, res, next) {
   if (error.length === 0) {
     var hash = bcrypt.hashSync(req.body.password, 10);
     var newUser = new UserModel({
-      username: req.body.username,
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
       email: req.body.email,
       password: hash,
       token: uid2(32),
@@ -160,9 +161,14 @@ router.post("/settings", async function (req, res, next) {
 });
 
 /* POST PROFIL page. */
-router.post("/profil", async function (req, res, next) {
-  res.render("index", { title: "Express" });
-});
+// router.get("/profil", async function (req, res, next) {
+//   var tokenExist = await UserModel.find({
+//     token: req.body.token
+//   });
+//   if (tokenExist===
+
+//   res.render({ firstname:  });
+// });
 
 /* POST SESSION page. */
 router.post("/sessions", async function (req, res, next) {
