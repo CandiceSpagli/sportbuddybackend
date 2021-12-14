@@ -219,23 +219,6 @@ router.post("/sessions", async function (req, res, next) {
   res.json({ sessionSaved });
 });
 
-//SETTINGS
-
-// router.post("/settings", async function (req, res, next) {
-//   var searchUser = new UserModel({
-//     //     username: req.body.username,
-//     //     email: req.body.email,
-//     //     password: req.body.password,
-//     //     token: "azert",
-//     //   });
-
-//     //   var userSaved = await newUser.save();
-//       // var searchUser = await UserModel.findOne({
-//   //   email: req.body.email,
-//   //   password: req.body.password,
-//   // });
-// });
-
 router.post("/picupload", async function (req, res, next) {
   var pictureName = "./tmp/" + uniqid() + ".jpg";
   var resultCopy = await req.files.avatar.mv(pictureName);
@@ -285,3 +268,16 @@ router.get("/searchScreen", async function (req, res, next) {
 });
 
 module.exports = router;
+
+/* GET journal page historique */
+router.get("/journal", async function (req, res, next) {
+  console.log("GET Journal userSession", req.query);
+  var user = await UserModel.findOne({ token: req.query.token });
+  console.log("ID recupéré par Token", user);
+  var userHistorique = await SessionModel.find({
+    $or: [{ creatorId: user._id }, { buddyId: user._id }],
+  });
+  console.log("userHistorique", userHistorique);
+
+  res.json({ userHistorique });
+});
