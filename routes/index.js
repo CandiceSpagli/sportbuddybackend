@@ -1,17 +1,17 @@
 var express = require("express");
 var router = express.Router();
-var fs = require('fs');
-var uniqid = require('uniqid');
+var fs = require("fs");
+var uniqid = require("uniqid");
 
 var uid2 = require("uid2");
 var bcrypt = require("bcrypt");
 
-var cloudinary = require('cloudinary').v2
+var cloudinary = require("cloudinary").v2;
 cloudinary.config({
-  cloud_name: 'de1o88p9o',
-  api_key: '172944832267927',
-  api_secret: 'pms6k9XCrnas-dVekWDf8pj-Kmw'
-})
+  cloud_name: "de1o88p9o",
+  api_key: "172944832267927",
+  api_secret: "pms6k9XCrnas-dVekWDf8pj-Kmw",
+});
 
 var SessionModel = require("../models/sessions");
 var UserModel = require("../models/users");
@@ -25,7 +25,8 @@ router.get("/", function (req, res, next) {
 /* POST SIGN UP*/
 router.post("/sign-up", async function (req, res, next) {
   console.log("req.body", req.body);
-  console.log("req.body.usernameFromFront", req.body.username);
+  console.log("req.body.firstnameFromFront", req.body.firstname);
+  console.log("req.body.lastnameFromFront", req.body.lastname);
   console.log("req.body.emailFromFront", req.body.email);
   console.log("req.body.passwordFromFront", req.body.password);
   var error = [];
@@ -42,7 +43,8 @@ router.post("/sign-up", async function (req, res, next) {
   }
 
   if (
-    req.body.username === "" ||
+    req.body.firstname === "" ||
+    req.body.lasttname === "" ||
     req.body.email === "" ||
     req.body.password === ""
   ) {
@@ -137,7 +139,7 @@ router.post("/sign-in", async function (req, res, next) {
 router.post("/settings", async function (req, res, next) {
   console.log("BODY FROM SETTINGS", req.body);
   const data = await UserModel.findOne({
-    token: "E28ei66sFtGjm4aGOHW8CQ2dxX6CzuEs",
+    token: req.body.token,
   });
 
   const updateUser = await UserModel.updateOne({
@@ -146,7 +148,7 @@ router.post("/settings", async function (req, res, next) {
     lastname: req.body.lastname,
     dateOfBirth: req.body.dateOfBirth,
     gender: req.body.gender,
-    picture: resultCloudinary.secure_url
+    picture: resultCloudinary.secure_url,
   });
 
   // var settingsUser = new UserModel({
@@ -160,15 +162,17 @@ router.post("/settings", async function (req, res, next) {
   res.json({ updateUser, userUpdate });
 });
 
-/* POST PROFIL page. */
-// router.get("/profil", async function (req, res, next) {
-//   var tokenExist = await UserModel.find({
-//     token: req.body.token
-//   });
-//   if (tokenExist===
+/* GET PROFIL page. */
+router.get("/profilScreen", async function (req, res, next) {
+  console.log("GET PROFIL userProfil", req.query);
+  var userProfil = await UserModel.findOne({ token: req.query.token });
+  const firstname = userProfil.firstname;
+  const lastname = userProfil.lastname;
+  // const desc = userProfil.desc;
+  const sport = userProfil.sport;
 
-//   res.render({ firstname:  });
-// });
+  res.json({ firstname, lastname, sport });
+});
 
 /* POST SESSION page. */
 router.post("/sessions", async function (req, res, next) {
@@ -194,61 +198,52 @@ router.post("/sessions", async function (req, res, next) {
   res.json({ sessionSaved });
 });
 
-//SETTINGS
-
-// router.post("/settings", async function (req, res, next) {
-//   var searchUser = new UserModel({
-//     //     username: req.body.username,
-//     //     email: req.body.email,
-//     //     password: req.body.password,
-//     //     token: "azert",
-//     //   });
-
-//     //   var userSaved = await newUser.save();
-//       // var searchUser = await UserModel.findOne({
-//   //   email: req.body.email,
-//   //   password: req.body.password,
-//   // });
-// });
-
-
-router.post('/picupload', async function(req, res, next) {
-  
-  var pictureName = './tmp/'+uniqid()+'.jpg';
+router.post("/picupload", async function (req, res, next) {
+  var pictureName = "./tmp/" + uniqid() + ".jpg";
   var resultCopy = await req.files.avatar.mv(pictureName);
-  if(!resultCopy) {
+  if (!resultCopy) {
     var resultCloudinary = await cloudinary.uploader.upload(pictureName);
     res.json({
       resultCloudinary,
     });
-    console.log('resultCloudinary' , resultCloudinary);
+    console.log("resultCloudinary", resultCloudinary);
   } else {
-    res.json({error: resultCopy});
+    res.json({ error: resultCopy });
   }
   fs.unlinkSync(pictureName);
 });
 
-router.get('/buddiesScreen', async function(req, res, next) {
-  console.log('<<<back /buddiesScreen');
-  var sessions = await SessionModel.find()
-    .populate('creatorId')
-    .exec()
-  console.log('sessions.creatorId',sessions);
+router.get("/buddiesScreen", async function (req, res, next) {
+  console.log("<<<back /buddiesScreen");
+  var sessions = await SessionModel.find().populate("creatorId").exec();
+  console.log("sessions.creatorId", sessions);
   res.json({
     result: true,
-    sessions
-  })
-})
+    sessions,
+  });
+});
 
-router.get('/searchScreen', async function(req, res, next) {
-  console.log('<<<back /searchScreen');
-  var users = await UserModel.find()
+router.get("/searchScreen", async function (req, res, next) {
+  console.log("<<<back /searchScreen");
+  var users = await UserModel.find();
   // console.log('users search',users);
   res.json({
     result: true,
-    users
-  })
-})
-
+    users,
+  });
+});
 
 module.exports = router;
+
+/* GET journal page historique */
+router.get("/journal", async function (req, res, next) {
+  console.log("GET Journal userSession", req.query);
+  var user = await UserModel.findOne({ token: req.query.token });
+  console.log("ID recupéré par Token", user);
+  var userHistorique = await SessionModel.find({
+    $or: [{ creatorId: user._id }, { buddyId: user._id }],
+  });
+  console.log("userHistorique", userHistorique);
+
+  res.json({ userHistorique });
+});
