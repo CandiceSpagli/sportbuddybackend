@@ -187,12 +187,14 @@ router.post("/settings", async function (req, res, next) {
 router.get("/profilScreen", async function (req, res, next) {
   console.log("GET PROFIL userProfil", req.query);
   var userProfil = await UserModel.findOne({ token: req.query.token });
+  console.log("userProfil", userProfil);
   const firstname = userProfil.firstname;
   const lastname = userProfil.lastname;
-  // const desc = userProfil.desc;
-  const sport = userProfil.sport;
+  const desc = userProfil.desc;
+  const sport = userProfil.sports;
+  const picture = userProfil.picture;
 
-  res.json({ firstname, lastname, sport });
+  res.json({ firstname, lastname, sport, desc, picture });
 });
 
 /* POST SESSION page. */
@@ -274,6 +276,10 @@ router.get("/journal", async function (req, res, next) {
   console.log("GET Journal userSession", req.query);
   var user = await UserModel.findOne({ token: req.query.token });
   console.log("ID recupéré par Token", user);
+  var firstname = user.firstname;
+  var lastname = user.lastname;
+  console.log("firstname", firstname);
+  console.log("lastname", lastname);
   var userHistorique = await SessionModel.find({
     $or: [{ creatorId: user._id }, { buddyId: user._id }],
   });

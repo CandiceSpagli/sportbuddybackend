@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 
 var sportSchema = mongoose.Schema({
-  type: String,
+  name: String,
   level: Number,
 });
 
