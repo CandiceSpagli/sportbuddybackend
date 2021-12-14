@@ -138,28 +138,49 @@ router.post("/sign-in", async function (req, res, next) {
 /* POST SETTINGS*/
 router.post("/settings", async function (req, res, next) {
   console.log("BODY FROM SETTINGS", req.body);
-  const data = await UserModel.findOne({
-    token: req.body.token,
-  });
+  // const data = await UserModel.findOne({
+  //   token: req.body.token,
+  // });
 
-  const updateUser = await UserModel.updateOne({
-    token: req.body.token,
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-    dateOfBirth: req.body.dateOfBirth,
-    gender: req.body.gender,
-    picture: resultCloudinary.secure_url,
-  });
+  // const updateUser = await UserModel.updateOne({
+  //   token: req.body.token,
+  //   firstname: req.body.firstname,
+  //   lastname: req.body.lastname,
+  //   dateOfBirth: req.body.dateOfBirth,
+  //   gender: req.body.gender,
+  //   picture: resultCloudinary.secure_url,
+  // });
+  // const data = await UserModel.findOne({
+  //   token: req.body.token,
+  // });
+  // console.log("SETTINGS TOKEN", data);
+
+  const updateUser = await UserModel.updateOne(
+    { token: req.body.token },
+    {
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      // dateOfBirth: req.body.dateOfBirth,
+      gender: req.body.gender,
+      // picture: resultCloudinary.secure_url,
+      sports: [
+        {
+          sportNameOne: req.body.sportNameOne,
+          sportLevelOne: req.body.sportLevelOne,
+        },
+      ],
+    }
+  );
+  console.log("UPDATE USER", updateUser);
 
   // var settingsUser = new UserModel({
   //   lastname: req.body.lastName,
   //   firstname: req.body.firstName,
   // });
   // console.log("SETTING USER", settingsUser);
-  console.log("dateOfBirth", dateOfBirth);
-  var userUpdate = await updateUser.save();
+  // console.log("dateOfBirth", dateOfBirth);
 
-  res.json({ updateUser, userUpdate });
+  res.json({ updateUser });
 });
 
 /* GET PROFIL page. */
@@ -198,6 +219,23 @@ router.post("/sessions", async function (req, res, next) {
   res.json({ sessionSaved });
 });
 
+//SETTINGS
+
+// router.post("/settings", async function (req, res, next) {
+//   var searchUser = new UserModel({
+//     //     username: req.body.username,
+//     //     email: req.body.email,
+//     //     password: req.body.password,
+//     //     token: "azert",
+//     //   });
+
+//     //   var userSaved = await newUser.save();
+//       // var searchUser = await UserModel.findOne({
+//   //   email: req.body.email,
+//   //   password: req.body.password,
+//   // });
+// });
+
 router.post("/picupload", async function (req, res, next) {
   var pictureName = "./tmp/" + uniqid() + ".jpg";
   var resultCopy = await req.files.avatar.mv(pictureName);
@@ -213,10 +251,23 @@ router.post("/picupload", async function (req, res, next) {
   fs.unlinkSync(pictureName);
 });
 
+// router.get("/buddiesScreen", async function (req, res, next) {
+//   console.log("<<<back /buddiesScreen");
+//   var sessions = await SessionModel.find().populate("creatorId").exec();
+//   console.log("sessions.creatorId", sessions);
+//   res.json({
+//     result: true,
+//     sessions,
+//   });
+// });
 router.get("/buddiesScreen", async function (req, res, next) {
   console.log("<<<back /buddiesScreen");
   var sessions = await SessionModel.find().populate("creatorId").exec();
-  console.log("sessions.creatorId", sessions);
+  // console.log('sessions.creatorId',sessions);
+
+  var filteredBySportSessions = await SessionModel.find({ sport: "yoga" });
+  console.log("filteredBySportSessions", filteredBySportSessions);
+
   res.json({
     result: true,
     sessions,
