@@ -25,7 +25,8 @@ router.get("/", function (req, res, next) {
 /* POST SIGN UP*/
 router.post("/sign-up", async function (req, res, next) {
   console.log("req.body", req.body);
-  console.log("req.body.usernameFromFront", req.body.username);
+  console.log("req.body.firstnameFromFront", req.body.firstname);
+  console.log("req.body.lastnameFromFront", req.body.lastname);
   console.log("req.body.emailFromFront", req.body.email);
   console.log("req.body.passwordFromFront", req.body.password);
   var error = [];
@@ -42,7 +43,8 @@ router.post("/sign-up", async function (req, res, next) {
   }
 
   if (
-    req.body.username === "" ||
+    req.body.firstname === "" ||
+    req.body.lasttname === "" ||
     req.body.email === "" ||
     req.body.password === ""
   ) {
@@ -183,70 +185,109 @@ router.get("/settings", async function (req, res, next) {
   console.log("USERSTAY", userStay);
   console.log("SPORTLOADED", sportsLoaded);
   res.json({ firstNameLoaded, lastNameLoaded, sportsLoaded });
-});
+  /* GET PROFIL page. */
+  router.get("/profilScreen", async function (req, res, next) {
+    console.log("GET PROFIL userProfil", req.query);
+    var userProfil = await UserModel.findOne({ token: req.query.token });
+    console.log("userProfil", userProfil);
+    const firstname = userProfil.firstname;
+    const lastname = userProfil.lastname;
+    const desc = userProfil.desc;
+    const sport = userProfil.sports;
+    const picture = userProfil.picture;
 
-/* POST SESSION page. */
-router.post("/sessions", async function (req, res, next) {
-  console.log("BODY FROM SESSION", req.body);
-  const data = await UserModel.findOne({
-    token: req.body.token,
-  });
-  console.log("DATA token FROM SESSIONS", data);
-
-  const newSession = new SessionModel({
-    creatorId: data._id,
-    date: req.body.date,
-    level: req.body.level,
-    sport: req.body.sport,
-    location: {
-      long: req.body.long,
-      lat: req.body.lat,
-    },
+    res.json({ firstname, lastname, sport, desc, picture });
   });
 
-  var sessionSaved = await newSession.save();
-
-  res.json({ sessionSaved });
-});
-
-//SETTINGS
-
-router.post("/picupload", async function (req, res, next) {
-  var pictureName = "./tmp/" + uniqid() + ".jpg";
-  var resultCopy = await req.files.avatar.mv(pictureName);
-  if (!resultCopy) {
-    var resultCloudinary = await cloudinary.uploader.upload(pictureName);
-    res.json({
-      resultCloudinary,
+  /* POST SESSION page. */
+  router.post("/sessions", async function (req, res, next) {
+    console.log("BODY FROM SESSION", req.body);
+    const data = await UserModel.findOne({
+      token: req.body.token,
     });
-    console.log("resultCloudinary", resultCloudinary);
-  } else {
-    res.json({ error: resultCopy });
-  }
-  fs.unlinkSync(pictureName);
-});
+    console.log("DATA token FROM SESSIONS", data);
 
-router.get("/buddiesScreen", async function (req, res, next) {
-  console.log("<<<back /buddiesScreen");
-  var sessions = await SessionModel.find().populate("creatorId").exec();
-  // console.log('sessions.creatorId',sessions);
+    const newSession = new SessionModel({
+      creatorId: data._id,
+      date: req.body.date,
+      level: req.body.level,
+      sport: req.body.sport,
+      location: {
+        long: req.body.long,
+        lat: req.body.lat,
+      },
+    });
 
-  var filteredBySportSessions = await SessionModel.find({ sport: "yoga" });
-  console.log("filteredBySportSessions", filteredBySportSessions);
+    var sessionSaved = await newSession.save();
 
-  res.json({
-    result: true,
-    sessions,
+    res.json({ sessionSaved });
   });
-});
 
-router.get("/searchScreen", async function (req, res, next) {
-  console.log("<<<back /searchScreen");
-  var users = await UserModel.find();
-  // console.log('users search',users);
-  res.json({
-    result: true,
-    users,
+  //SETTINGS
+
+  router.post("/picupload", async function (req, res, next) {
+    var pictureName = "./tmp/" + uniqid() + ".jpg";
+    var resultCopy = await req.files.avatar.mv(pictureName);
+    if (!resultCopy) {
+      var resultCloudinary = await cloudinary.uploader.upload(pictureName);
+      res.json({
+        resultCloudinary,
+      });
+      console.log("resultCloudinary", resultCloudinary);
+    } else {
+      res.json({ error: resultCopy });
+    }
+    fs.unlinkSync(pictureName);
+  });
+
+  // router.get("/buddiesScreen", async function (req, res, next) {
+  //   console.log("<<<back /buddiesScreen");
+  //   var sessions = await SessionModel.find().populate("creatorId").exec();
+  //   console.log("sessions.creatorId", sessions);
+  //   res.json({
+  //     result: true,
+  //     sessions,
+  //   });
+  // });
+  router.get("/buddiesScreen", async function (req, res, next) {
+    console.log("<<<back /buddiesScreen");
+    var sessions = await SessionModel.find().populate("creatorId").exec();
+    // console.log('sessions.creatorId',sessions);
+
+    var filteredBySportSessions = await SessionModel.find({ sport: "yoga" });
+    console.log("filteredBySportSessions", filteredBySportSessions);
+
+    res.json({
+      result: true,
+      sessions,
+    });
+  });
+
+  router.get("/searchScreen", async function (req, res, next) {
+    console.log("<<<back /searchScreen");
+    var users = await UserModel.find();
+    // console.log('users search',users);
+    res.json({
+      result: true,
+      users,
+    });
+  });
+
+  /* GET journal page historique */
+  router.get("/journal", async function (req, res, next) {
+    console.log("GET Journal userSession", req.query);
+    var user = await UserModel.findOne({ token: req.query.token });
+    console.log("ID recupéré par Token", user);
+    var firstname = user.firstname;
+    var lastname = user.lastname;
+    console.log("firstname", firstname);
+    console.log("lastname", lastname);
+    var userHistorique = await SessionModel.find({
+      $or: [{ creatorId: user._id }, { buddyId: user._id }],
+    });
+    console.log("userHistorique", userHistorique);
+
+    res.json({ userHistorique });
   });
 });
 

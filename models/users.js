@@ -8,7 +8,6 @@ var sportSchema = mongoose.Schema({
 var userSchema = mongoose.Schema({
   lastname: String,
   firstname: String,
-  username: String,
   email: String,
   password: String,
   gender: String,
