@@ -136,10 +136,6 @@ router.post("/sign-in", async function (req, res, next) {
 /* POST SETTINGS*/
 router.post("/settings", async function (req, res, next) {
   console.log("BODY FROM SETTINGS", req.body);
-  // const data = await UserModel.findOne({
-  //   token: req.body.token,
-  // });
-  // console.log("SETTINGS TOKEN", data);
 
   const updateUser = await UserModel.updateOne(
     { token: req.body.token },
@@ -151,33 +147,43 @@ router.post("/settings", async function (req, res, next) {
       // picture: resultCloudinary.secure_url,
       sports: [
         {
-          sportNameOne: req.body.sportNameOne,
-          sportLevelOne: req.body.sportLevelOne,
+          name: req.body.sportName1,
+          level: req.body.sportLevel1,
+        },
+        {
+          name: req.body.sportName2,
+          level: req.body.sportLevel2,
+        },
+        {
+          name: req.body.sportName3,
+          level: req.body.sportLevel3,
         },
       ],
     }
   );
   console.log("UPDATE USER", updateUser);
 
-  // var settingsUser = new UserModel({
-  //   lastname: req.body.lastName,
-  //   firstname: req.body.firstName,
-  // });
-  // console.log("SETTING USER", settingsUser);
-  // console.log("dateOfBirth", dateOfBirth);
-
   res.json({ updateUser });
 });
+router.get("/settings", async function (req, res, next) {
+  console.log("REQ QUERY SETTINGS", req.query);
 
-/* POST PROFIL page. */
-// router.get("/profil", async function (req, res, next) {
-//   var tokenExist = await UserModel.find({
-//     token: req.body.token
-//   });
-//   if (tokenExist===
+  const userStay = await UserModel.findOne({
+    token: req.query.token,
+  });
 
-//   res.render({ firstname:  });
-// });
+  const firstNameLoaded = userStay.firstname;
+  const lastNameLoaded = userStay.lastname;
+  const genderLoaded = userStay.gender;
+  const sportsLoaded = userStay.sports;
+
+  console.log("FIRSTNAME LOADED", firstNameLoaded);
+  console.log("LASTNAME LOADED", lastNameLoaded);
+  console.log("GENDER", genderLoaded);
+  console.log("USERSTAY", userStay);
+  console.log("SPORTLOADED", sportsLoaded);
+  res.json({ firstNameLoaded, lastNameLoaded, sportsLoaded });
+});
 
 /* POST SESSION page. */
 router.post("/sessions", async function (req, res, next) {
@@ -205,21 +211,6 @@ router.post("/sessions", async function (req, res, next) {
 
 //SETTINGS
 
-// router.post("/settings", async function (req, res, next) {
-//   var searchUser = new UserModel({
-//     //     username: req.body.username,
-//     //     email: req.body.email,
-//     //     password: req.body.password,
-//     //     token: "azert",
-//     //   });
-
-//     //   var userSaved = await newUser.save();
-//       // var searchUser = await UserModel.findOne({
-//   //   email: req.body.email,
-//   //   password: req.body.password,
-//   // });
-// });
-
 router.post("/picupload", async function (req, res, next) {
   var pictureName = "./tmp/" + uniqid() + ".jpg";
   var resultCopy = await req.files.avatar.mv(pictureName);
@@ -235,21 +226,19 @@ router.post("/picupload", async function (req, res, next) {
   fs.unlinkSync(pictureName);
 });
 
-router.get('/buddiesScreen', async function(req, res, next) {
-  console.log('<<<back /buddiesScreen');
-  var sessions = await SessionModel.find()
-    .populate('creatorId')
-    .exec()
+router.get("/buddiesScreen", async function (req, res, next) {
+  console.log("<<<back /buddiesScreen");
+  var sessions = await SessionModel.find().populate("creatorId").exec();
   // console.log('sessions.creatorId',sessions);
-  
-  var filteredBySportSessions = await SessionModel.find({sport : 'yoga'})
-  console.log('filteredBySportSessions', filteredBySportSessions);
+
+  var filteredBySportSessions = await SessionModel.find({ sport: "yoga" });
+  console.log("filteredBySportSessions", filteredBySportSessions);
 
   res.json({
     result: true,
     sessions,
-  })
-})
+  });
+});
 
 router.get("/searchScreen", async function (req, res, next) {
   console.log("<<<back /searchScreen");
