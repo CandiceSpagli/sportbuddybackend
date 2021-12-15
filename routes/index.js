@@ -178,7 +178,9 @@ router.get("/settings", async function (req, res, next) {
   const firstNameLoaded = userStay.firstname;
   const lastNameLoaded = userStay.lastname;
   const genderLoaded = userStay.gender;
-  const sportsLoaded = userStay.sports;
+  const sportsLoaded = userStay.sports.filter((sport) => {
+    return sport.name;
+  });
 
   console.log("FIRSTNAME LOADED", firstNameLoaded);
   console.log("LASTNAME LOADED", lastNameLoaded);
