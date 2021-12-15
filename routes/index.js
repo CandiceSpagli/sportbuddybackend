@@ -228,7 +228,7 @@ router.post("/sessions", async function (req, res, next) {
   res.json({ sessionSaved });
 });
 
-//SETTINGS
+//pickload
 
 router.post("/picupload", async function (req, res, next) {
   var pictureName = "./tmp/" + uniqid() + ".jpg";
@@ -268,6 +268,7 @@ router.get("/buddiesScreen", async function (req, res, next) {
   });
 });
 
+//searchSrceen
 router.get("/searchScreen", async function (req, res, next) {
   console.log("<<<back /searchScreen");
   var users = await UserModel.find();
@@ -307,13 +308,13 @@ router.get("/journal", async function (req, res, next) {
 //   res.json({ firstname, lastname, sport });
 // });
 
-// /* POST SESSION page. */
-// router.post("/sessions", async function (req, res, next) {
-//   console.log("BODY FROM SESSION", req.body);
-//   const data = await UserModel.findOne({
-//     token: req.body.token,
-//   const userStay = await UserModel.findOne({
-//     token: req.query.token,
-//   });
+router.delete("/user-delete", async function (req, res, next) {
+  await UserModel.deleteOne({
+    email: "Christelle@monaco.mc",
+  });
+  res.json({
+    result: true,
+  });
+});
 
 module.exports = router;
