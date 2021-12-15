@@ -138,22 +138,6 @@ router.post("/sign-in", async function (req, res, next) {
 /* POST SETTINGS*/
 router.post("/settings", async function (req, res, next) {
   console.log("BODY FROM SETTINGS", req.body);
-  // const data = await UserModel.findOne({
-  //   token: req.body.token,
-  // });
-
-  // const updateUser = await UserModel.updateOne({
-  //   token: req.body.token,
-  //   firstname: req.body.firstname,
-  //   lastname: req.body.lastname,
-  //   dateOfBirth: req.body.dateOfBirth,
-  //   gender: req.body.gender,
-  //   picture: resultCloudinary.secure_url,
-  // });
-  // const data = await UserModel.findOne({
-  //   token: req.body.token,
-  // });
-  // console.log("SETTINGS TOKEN", data);
 
   const updateUser = await UserModel.updateOne(
     { token: req.body.token },
@@ -165,34 +149,57 @@ router.post("/settings", async function (req, res, next) {
       // picture: resultCloudinary.secure_url,
       sports: [
         {
-          sportNameOne: req.body.sportNameOne,
-          sportLevelOne: req.body.sportLevelOne,
+          name: req.body.sportName1,
+          level: req.body.sportLevel1,
+        },
+        {
+          name: req.body.sportName2,
+          level: req.body.sportLevel2,
+        },
+        {
+          name: req.body.sportName3,
+          level: req.body.sportLevel3,
         },
       ],
     }
   );
   console.log("UPDATE USER", updateUser);
 
-  // var settingsUser = new UserModel({
-  //   lastname: req.body.lastName,
-  //   firstname: req.body.firstName,
-  // });
-  // console.log("SETTING USER", settingsUser);
-  // console.log("dateOfBirth", dateOfBirth);
-
   res.json({ updateUser });
+});
+
+router.get("/settings", async function (req, res, next) {
+  console.log("REQ QUERY SETTINGS", req.query);
+
+  const userStay = await UserModel.findOne({
+    token: req.query.token,
+  });
+
+  const firstNameLoaded = userStay.firstname;
+  const lastNameLoaded = userStay.lastname;
+  const genderLoaded = userStay.gender;
+  const sportsLoaded = userStay.sports;
+
+  console.log("FIRSTNAME LOADED", firstNameLoaded);
+  console.log("LASTNAME LOADED", lastNameLoaded);
+  console.log("GENDER", genderLoaded);
+  console.log("USERSTAY", userStay);
+  console.log("SPORTLOADED", sportsLoaded);
+  res.json({ firstNameLoaded, lastNameLoaded, sportsLoaded });
 });
 
 /* GET PROFIL page. */
 router.get("/profilScreen", async function (req, res, next) {
   console.log("GET PROFIL userProfil", req.query);
   var userProfil = await UserModel.findOne({ token: req.query.token });
+  console.log("userProfil", userProfil);
   const firstname = userProfil.firstname;
   const lastname = userProfil.lastname;
-  // const desc = userProfil.desc;
-  const sport = userProfil.sport;
+  const desc = userProfil.desc;
+  const sport = userProfil.sports;
+  const picture = userProfil.picture;
 
-  res.json({ firstname, lastname, sport });
+  res.json({ firstname, lastname, sport, desc, picture });
 });
 
 /* POST SESSION page. */
@@ -218,6 +225,8 @@ router.post("/sessions", async function (req, res, next) {
 
   res.json({ sessionSaved });
 });
+
+//SETTINGS
 
 router.post("/picupload", async function (req, res, next) {
   var pictureName = "./tmp/" + uniqid() + ".jpg";
@@ -267,13 +276,15 @@ router.get("/searchScreen", async function (req, res, next) {
   });
 });
 
-module.exports = router;
-
 /* GET journal page historique */
 router.get("/journal", async function (req, res, next) {
   console.log("GET Journal userSession", req.query);
   var user = await UserModel.findOne({ token: req.query.token });
   console.log("ID recupéré par Token", user);
+  var firstname = user.firstname;
+  var lastname = user.lastname;
+  console.log("firstname", firstname);
+  console.log("lastname", lastname);
   var userHistorique = await SessionModel.find({
     $or: [{ creatorId: user._id }, { buddyId: user._id }],
   });
@@ -281,4 +292,26 @@ router.get("/journal", async function (req, res, next) {
 
   res.json({ userHistorique });
 });
+
+/* GET PROFIL page. */
+// router.get("/profilScreen", async function (req, res, next) {
+//   console.log("GET PROFIL userProfil", req.query);
+//   var userProfil = await UserModel.findOne({ token: req.query.token });
+//   const firstname = userProfil.firstname;
+//   const lastname = userProfil.lastname;
+//   // const desc = userProfil.desc;
+//   const sport = userProfil.sport;
+
+//   res.json({ firstname, lastname, sport });
+// });
+
+// /* POST SESSION page. */
+// router.post("/sessions", async function (req, res, next) {
+//   console.log("BODY FROM SESSION", req.body);
+//   const data = await UserModel.findOne({
+//     token: req.body.token,
+//   const userStay = await UserModel.findOne({
+//     token: req.query.token,
+//   });
+
 module.exports = router;
