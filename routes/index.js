@@ -24,11 +24,11 @@ router.get("/", function (req, res, next) {
 
 /* POST SIGN UP*/
 router.post("/sign-up", async function (req, res, next) {
-  console.log("req.body", req.body);
-  console.log("req.body.firstnameFromFront", req.body.firstname);
-  console.log("req.body.lastnameFromFront", req.body.lastname);
-  console.log("req.body.emailFromFront", req.body.email);
-  console.log("req.body.passwordFromFront", req.body.password);
+  // console.log("req.body", req.body);
+  // console.log("req.body.firstnameFromFront", req.body.firstname);
+  // console.log("req.body.lastnameFromFront", req.body.lastname);
+  // console.log("req.body.emailFromFront", req.body.email);
+  // console.log("req.body.passwordFromFront", req.body.password);
   var error = [];
   var result = false;
   var saveUser = null;
@@ -60,7 +60,7 @@ router.post("/sign-up", async function (req, res, next) {
       password: hash,
       token: uid2(32),
     });
-    console.log("newUser:user+mail+password+token", newUser);
+    // console.log("newUser:user+mail+password+token", newUser);
 
     saveUser = await newUser.save();
 
@@ -93,7 +93,7 @@ router.post("/sign-up", async function (req, res, next) {
 
 /* POST SIGN IN*/
 router.post("/sign-in", async function (req, res, next) {
-  console.log("req.body-sign-in", req.body);
+  // console.log("req.body-sign-in", req.body);
   // var searchUser = await UserModel.findOne({
   //   email: req.body.email,
   //   password: req.body.password,
@@ -144,8 +144,10 @@ router.post("/settings", async function (req, res, next) {
     {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
+      // picture: req.body.resultCloudinary.url,
       // dateOfBirth: req.body.dateOfBirth,
       gender: req.body.gender,
+      desc: req.body.desc,
       // picture: resultCloudinary.secure_url,
       sports: [
         {
@@ -169,7 +171,7 @@ router.post("/settings", async function (req, res, next) {
 });
 
 router.get("/settings", async function (req, res, next) {
-  console.log("REQ QUERY SETTINGS", req.query);
+  // console.log("REQ QUERY SETTINGS", req.query);
 
   const userStay = await UserModel.findOne({
     token: req.query.token,
@@ -182,19 +184,19 @@ router.get("/settings", async function (req, res, next) {
     return sport.name;
   });
 
-  console.log("FIRSTNAME LOADED", firstNameLoaded);
-  console.log("LASTNAME LOADED", lastNameLoaded);
-  console.log("GENDER", genderLoaded);
-  console.log("USERSTAY", userStay);
-  console.log("SPORTLOADED", sportsLoaded);
+  // console.log("FIRSTNAME LOADED", firstNameLoaded);
+  // console.log("LASTNAME LOADED", lastNameLoaded);
+  // console.log("GENDER", genderLoaded);
+  // console.log("USERSTAY", userStay);
+  // console.log("SPORTLOADED", sportsLoaded);
   res.json({ firstNameLoaded, lastNameLoaded, sportsLoaded });
 });
 
 /* GET PROFIL page. */
 router.get("/profilScreen", async function (req, res, next) {
-  console.log("GET PROFIL userProfil", req.query);
+  // console.log("GET PROFIL userProfil", req.query);
   var userProfil = await UserModel.findOne({ token: req.query.token });
-  console.log("userProfil", userProfil);
+  // console.log("userProfil", userProfil);
   const firstname = userProfil.firstname;
   const lastname = userProfil.lastname;
   const desc = userProfil.desc;
@@ -231,14 +233,28 @@ router.post("/sessions", async function (req, res, next) {
 //pickload
 
 router.post("/picupload", async function (req, res, next) {
+  const dataModel = await UserModel.findOne({
+    token: req.body.token,
+  });
+
+  // console.log("DATA from PICUPLOAD", dataModel);
+
   var pictureName = "./tmp/" + uniqid() + ".jpg";
   var resultCopy = await req.files.avatar.mv(pictureName);
   if (!resultCopy) {
     var resultCloudinary = await cloudinary.uploader.upload(pictureName);
+    const updatePhoto = await UserModel.updateOne(
+      {
+        token: req.body.token,
+      },
+      {
+        picture: resultCloudinary.url,
+      }
+    );
     res.json({
       resultCloudinary,
     });
-    console.log("resultCloudinary", resultCloudinary);
+    // console.log("resultCloudinary", resultCloudinary);
   } else {
     res.json({ error: resultCopy });
   }
@@ -270,7 +286,7 @@ router.get("/buddiesScreen", async function (req, res, next) {
 
 //searchSrceen
 router.get("/searchScreen", async function (req, res, next) {
-  console.log("<<<back /searchScreen");
+  // console.log("<<<back /searchScreen");
   var users = await UserModel.find();
   // console.log('users search',users);
   res.json({
