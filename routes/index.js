@@ -284,13 +284,10 @@ router.get("/journal", async function (req, res, next) {
   console.log("GET Journal userSession", req.query);
   var user = await UserModel.findOne({ token: req.query.token });
   console.log("ID recupéré par Token", user);
-  var firstname = user.firstname;
-  var lastname = user.lastname;
-  console.log("firstname", firstname);
-  console.log("lastname", lastname);
+
   var userHistorique = await SessionModel.find({
     $or: [{ creatorId: user._id }, { buddyId: user._id }],
-  });
+  }).populate("buddyId");
   console.log("userHistorique", userHistorique);
 
   res.json({ userHistorique });
