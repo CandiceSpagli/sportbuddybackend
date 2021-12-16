@@ -270,19 +270,24 @@ router.post("/picupload", async function (req, res, next) {
   fs.unlinkSync(pictureName);
 });
 
-// router.get("/buddiesScreen", async function (req, res, next) {
-//   console.log("<<<back /buddiesScreen");
-//   var sessions = await SessionModel.find().populate("creatorId").exec();
-//   console.log("sessions.creatorId", sessions);
-//   res.json({
-//     result: true,
-//     sessions,
-//   });
-// });
+//POST accepter RDV Buddy Screem
+router.post("/buddiesScreen", async function (req, res, next) {
+  console.log("POST Buddy accept rdv", req.body);
+  const userData = await UserModel.findOne({ token: req.body.token });
+  console.log("DATA token BUDDY SCREEN ", userData);
+  const updateSession = await SessionModel.updateOne(
+    { _id: req.body.sessionId },
+    { buddyId: userData._id }
+  );
+
+  res.json({ updateSession });
+});
+
+//GET accepter RDV Buddy Screem
 router.get("/buddiesScreen", async function (req, res, next) {
   console.log("<<<back /buddiesScreen");
   var sessions = await SessionModel.find().populate("creatorId").exec();
-  // console.log('sessions.creatorId',sessions);
+  console.log("sessions.creatorId", sessions);
 
   var filteredBySportSessions = await SessionModel.find({ sport: "yoga" });
   console.log("filteredBySportSessions", filteredBySportSessions);
@@ -317,18 +322,6 @@ router.get("/journal", async function (req, res, next) {
 
   res.json({ userHistorique });
 });
-
-/* GET PROFIL page. */
-// router.get("/profilScreen", async function (req, res, next) {
-//   console.log("GET PROFIL userProfil", req.query);
-//   var userProfil = await UserModel.findOne({ token: req.query.token });
-//   const firstname = userProfil.firstname;
-//   const lastname = userProfil.lastname;
-//   // const desc = userProfil.desc;
-//   const sport = userProfil.sport;
-
-//   res.json({ firstname, lastname, sport });
-// });
 
 router.delete("/user-delete", async function (req, res, next) {
   await UserModel.deleteOne({
