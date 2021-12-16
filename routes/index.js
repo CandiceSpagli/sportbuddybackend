@@ -148,6 +148,7 @@ router.post("/settings", async function (req, res, next) {
       // dateOfBirth: req.body.dateOfBirth,
       gender: req.body.gender,
       desc: req.body.desc,
+
       // picture: resultCloudinary.secure_url,
       sports: [
         {
@@ -176,7 +177,8 @@ router.get("/settings", async function (req, res, next) {
   const userStay = await UserModel.findOne({
     token: req.query.token,
   });
-
+  const picture = userStay.picture;
+  const desc = userStay.desc;
   const firstNameLoaded = userStay.firstname;
   const lastNameLoaded = userStay.lastname;
   const genderLoaded = userStay.gender;
@@ -189,12 +191,19 @@ router.get("/settings", async function (req, res, next) {
   // console.log("GENDER", genderLoaded);
   // console.log("USERSTAY", userStay);
   // console.log("SPORTLOADED", sportsLoaded);
-  res.json({ firstNameLoaded, lastNameLoaded, sportsLoaded });
+  res.json({
+    firstNameLoaded,
+    lastNameLoaded,
+    sportsLoaded,
+    genderLoaded,
+    desc,
+    picture,
+  });
 });
 
 /* GET PROFIL page. */
 router.get("/profilScreen", async function (req, res, next) {
-  // console.log("GET PROFIL userProfil", req.query);
+  console.log("GET PROFIL userProfil", req.query);
   var userProfil = await UserModel.findOne({ token: req.query.token });
   // console.log("userProfil", userProfil);
   const firstname = userProfil.firstname;
@@ -202,7 +211,7 @@ router.get("/profilScreen", async function (req, res, next) {
   const desc = userProfil.desc;
   const sport = userProfil.sports;
   const picture = userProfil.picture;
-
+  console.log("GET PROFIL userProfil", req.query);
   res.json({ firstname, lastname, sport, desc, picture });
 });
 
